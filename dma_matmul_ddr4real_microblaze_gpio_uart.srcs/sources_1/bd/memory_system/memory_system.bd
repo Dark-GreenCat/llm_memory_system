@@ -1,13 +1,14 @@
 {
   "design": {
     "design_info": {
-      "boundary_crc": "0x37415471A94B854E",
+      "boundary_crc": "0xD202E96AC483991D",
       "device": "xcu250-figd2104-2L-e",
       "gen_directory": "../../../../dma_matmul_ddr4real_microblaze_gpio_uart.gen/sources_1/bd/memory_system",
       "name": "memory_system",
       "rev_ctrl_bd_flag": "RevCtrlBdOff",
       "synth_flow_mode": "Hierarchical",
-      "tool_version": "2024.1"
+      "tool_version": "2024.1",
+      "validated": "true"
     },
     "design_tree": {
       "axi_cdma": "",
@@ -52,7 +53,7 @@
       "bram_init_addr_msb": "",
       "ddr4_0": "",
       "rst_ddr4_0_300M": "",
-      "resetn_inv_0": ""
+      "start_matmul_request_detector": ""
     },
     "interface_ports": {
       "default_300mhz_clk0": {
@@ -551,6 +552,30 @@
             "direction": "O"
           }
         }
+      },
+      "user_si570_clk": {
+        "mode": "Slave",
+        "vlnv_bus_definition": "xilinx.com:interface:diff_clock:1.0",
+        "vlnv": "xilinx.com:interface:diff_clock_rtl:1.0",
+        "parameters": {
+          "CAN_DEBUG": {
+            "value": "false",
+            "value_src": "default"
+          },
+          "FREQ_HZ": {
+            "value": "156250000"
+          }
+        },
+        "port_maps": {
+          "CLK_N": {
+            "physical_name": "user_si570_clk_clk_n",
+            "direction": "I"
+          },
+          "CLK_P": {
+            "physical_name": "user_si570_clk_clk_p",
+            "direction": "I"
+          }
+        }
       }
     },
     "ports": {
@@ -558,6 +583,10 @@
         "type": "rst",
         "direction": "I",
         "parameters": {
+          "INSERT_VIP": {
+            "value": "0",
+            "value_src": "default"
+          },
           "POLARITY": {
             "value": "ACTIVE_LOW"
           }
@@ -565,7 +594,29 @@
       },
       "ui_clk": {
         "type": "clk",
-        "direction": "O"
+        "direction": "O",
+        "parameters": {
+          "CLK_DOMAIN": {
+            "value": "memory_system_clk_wiz_0_clk_out1",
+            "value_src": "default_prop"
+          },
+          "FREQ_HZ": {
+            "value": "200892857",
+            "value_src": "ip_prop"
+          },
+          "FREQ_TOLERANCE_HZ": {
+            "value": "0",
+            "value_src": "default"
+          },
+          "INSERT_VIP": {
+            "value": "0",
+            "value_src": "default"
+          },
+          "PHASE": {
+            "value": "0.0",
+            "value_src": "ip_prop"
+          }
+        }
       },
       "v_reg_src_addr": {
         "direction": "O",
@@ -582,15 +633,13 @@
         "left": "3",
         "right": "0"
       },
-      "start_matmul_request": {
-        "direction": "O",
-        "left": "0",
-        "right": "0"
-      },
       "matmul_idle": {
         "direction": "I",
         "left": "0",
         "right": "0"
+      },
+      "start_matmul_request": {
+        "direction": "O"
       }
     },
     "components": {
@@ -666,7 +715,7 @@
         "inst_hier_path": "bram_init",
         "parameters": {
           "Coe_File": {
-            "value": "../../../../../../../../Documents/dma_vivado/20241/mem_system_microblaze/mem_system_microblaze.srcs/sources_1/imports/mem_system.srcs/ram_init.coe"
+            "value": "../../../../imports/mem_system.srcs/ram_init.coe"
           },
           "EN_SAFETY_CKT": {
             "value": "false"
@@ -720,19 +769,19 @@
             "value": "PLL"
           },
           "CLKIN1_JITTER_PS": {
-            "value": "33.330000000000005"
+            "value": "64.0"
           },
           "CLKOUT1_DRIVES": {
             "value": "Buffer"
           },
           "CLKOUT1_JITTER": {
-            "value": "125.285"
+            "value": "87.637"
           },
           "CLKOUT1_PHASE_ERROR": {
-            "value": "114.212"
+            "value": "76.682"
           },
           "CLKOUT1_REQUESTED_OUT_FREQ": {
-            "value": "200"
+            "value": "200.89286"
           },
           "CLKOUT2_DRIVES": {
             "value": "Buffer"
@@ -762,31 +811,37 @@
             "value": "OPTIMIZED"
           },
           "MMCM_CLKFBOUT_MULT_F": {
-            "value": "8"
+            "value": "9"
           },
           "MMCM_CLKIN1_PERIOD": {
-            "value": "3.333"
+            "value": "6.400"
           },
           "MMCM_CLKIN2_PERIOD": {
-            "value": "10.0"
+            "value": "10.000"
           },
           "MMCM_CLKOUT0_DIVIDE_F": {
-            "value": "4"
+            "value": "7"
           },
           "MMCM_COMPENSATION": {
             "value": "AUTO"
           },
           "MMCM_DIVCLK_DIVIDE": {
-            "value": "3"
+            "value": "1"
           },
           "OPTIMIZE_CLOCKING_STRUCTURE_EN": {
             "value": "true"
           },
+          "PHASESHIFT_MODE": {
+            "value": "WAVEFORM"
+          },
           "PRIMITIVE": {
             "value": "Auto"
           },
+          "PRIM_IN_FREQ": {
+            "value": "156.250"
+          },
           "PRIM_SOURCE": {
-            "value": "Single_ended_clock_capable_pin"
+            "value": "Differential_clock_capable_pin"
           },
           "RESET_BOARD_INTERFACE": {
             "value": "Custom"
@@ -798,7 +853,7 @@
             "value": "true"
           },
           "USE_RESET": {
-            "value": "true"
+            "value": "false"
           }
         }
       },
@@ -2156,10 +2211,10 @@
         "inst_hier_path": "ddr4_0",
         "parameters": {
           "ADDN_UI_CLKOUT1_FREQ_HZ": {
-            "value": "300"
+            "value": "None"
           },
           "ADDN_UI_CLKOUT2_FREQ_HZ": {
-            "value": "100"
+            "value": "None"
           },
           "C0.DDR4_AUTO_AP_COL_A3": {
             "value": "true"
@@ -2225,18 +2280,51 @@
         "xci_path": "ip/memory_system_rst_ddr4_0_300M_0/memory_system_rst_ddr4_0_300M_0.xci",
         "inst_hier_path": "rst_ddr4_0_300M"
       },
-      "resetn_inv_0": {
-        "vlnv": "xilinx.com:ip:util_vector_logic:2.0",
-        "ip_revision": "4",
-        "xci_name": "memory_system_resetn_inv_0_0",
-        "xci_path": "ip/memory_system_resetn_inv_0_0/memory_system_resetn_inv_0_0.xci",
-        "inst_hier_path": "resetn_inv_0",
-        "parameters": {
-          "C_OPERATION": {
-            "value": "not"
+      "start_matmul_request_detector": {
+        "vlnv": "xilinx.com:module_ref:rising_edge_detector:1.0",
+        "ip_revision": "1",
+        "xci_name": "memory_system_rising_edge_detector_0_0",
+        "xci_path": "ip/memory_system_rising_edge_detector_0_0/memory_system_rising_edge_detector_0_0.xci",
+        "inst_hier_path": "start_matmul_request_detector",
+        "reference_info": {
+          "ref_type": "hdl",
+          "ref_name": "rising_edge_detector",
+          "boundary_crc": "0x0"
+        },
+        "ports": {
+          "clk": {
+            "type": "clk",
+            "direction": "I",
+            "parameters": {
+              "FREQ_HZ": {
+                "value": "200892857",
+                "value_src": "ip_prop"
+              },
+              "PHASE": {
+                "value": "0.0",
+                "value_src": "ip_prop"
+              },
+              "CLK_DOMAIN": {
+                "value": "memory_system_clk_wiz_0_clk_out1",
+                "value_src": "default_prop"
+              }
+            }
           },
-          "C_SIZE": {
-            "value": "1"
+          "rst_n": {
+            "type": "rst",
+            "direction": "I",
+            "parameters": {
+              "POLARITY": {
+                "value": "ACTIVE_LOW",
+                "value_src": "constant"
+              }
+            }
+          },
+          "signal_i": {
+            "direction": "I"
+          },
+          "pulse": {
+            "direction": "O"
           }
         }
       }
@@ -2264,6 +2352,12 @@
         "interface_ports": [
           "matrix_regfile3_port",
           "matrix_regfile3/BRAM_PORTB"
+        ]
+      },
+      "CLK_IN1_D_0_1": {
+        "interface_ports": [
+          "user_si570_clk",
+          "clk_wiz/CLK_IN1_D"
         ]
       },
       "axi_cdma_M_AXI": {
@@ -2394,6 +2488,13 @@
           "control_input/In3"
         ]
       },
+      "SYS_Rst_1": {
+        "ports": [
+          "rst_clk_wiz_100M/bus_struct_reset",
+          "microblaze_riscv_0_local_memory/SYS_Rst",
+          "ddr4_0/sys_rst"
+        ]
+      },
       "axi_bram_ctrl_0_bram1_douta": {
         "ports": [
           "vector_regfile/douta",
@@ -2512,18 +2613,6 @@
           "axi_gpio/gpio_io_i"
         ]
       },
-      "ddr4_0_addn_ui_clkout1": {
-        "ports": [
-          "ddr4_0/addn_ui_clkout1",
-          "clk_wiz/clk_in1"
-        ]
-      },
-      "ddr4_0_addn_ui_clkout2": {
-        "ports": [
-          "ddr4_0/addn_ui_clkout2",
-          "ui_clk"
-        ]
-      },
       "ddr4_0_c0_ddr4_ui_clk": {
         "ports": [
           "ddr4_0/c0_ddr4_ui_clk",
@@ -2534,8 +2623,7 @@
       "ddr4_0_c0_ddr4_ui_clk_sync_rst": {
         "ports": [
           "ddr4_0/c0_ddr4_ui_clk_sync_rst",
-          "rst_ddr4_0_300M/ext_reset_in",
-          "clk_wiz/reset"
+          "rst_ddr4_0_300M/ext_reset_in"
         ]
       },
       "ddr4_0_c0_init_calib_complete": {
@@ -2740,26 +2828,21 @@
           "microblaze_riscv_0_local_memory/LMB_Clk",
           "axi_gpio/s_axi_aclk",
           "axi_smc/aclk",
-          "axi_uart/s_axi_aclk"
+          "axi_uart/s_axi_aclk",
+          "ui_clk",
+          "start_matmul_request_detector/clk"
         ]
       },
       "resetn_1": {
         "ports": [
           "resetn",
-          "rst_clk_wiz_100M/ext_reset_in",
-          "resetn_inv_0/Op1"
+          "rst_clk_wiz_100M/ext_reset_in"
         ]
       },
-      "resetn_inv_0_Res": {
+      "rising_edge_detector_0_pulse": {
         "ports": [
-          "resetn_inv_0/Res",
-          "ddr4_0/sys_rst"
-        ]
-      },
-      "rst_clk_wiz_100M_bus_struct_reset": {
-        "ports": [
-          "rst_clk_wiz_100M/bus_struct_reset",
-          "microblaze_riscv_0_local_memory/SYS_Rst"
+          "start_matmul_request_detector/pulse",
+          "start_matmul_request"
         ]
       },
       "rst_clk_wiz_100M_mb_reset": {
@@ -2780,7 +2863,8 @@
           "matrix_regfile_ctrl3/s_axi_aresetn",
           "axi_gpio/s_axi_aresetn",
           "axi_smc/aresetn",
-          "axi_uart/s_axi_aresetn"
+          "axi_uart/s_axi_aresetn",
+          "start_matmul_request_detector/rst_n"
         ]
       },
       "rst_ddr4_0_300M_peripheral_aresetn": {
@@ -2792,7 +2876,7 @@
       "start_matmul_request_Dout": {
         "ports": [
           "start_matmul_request/Dout",
-          "start_matmul_request"
+          "start_matmul_request_detector/signal_i"
         ]
       },
       "v_reg_dest_Dout": {

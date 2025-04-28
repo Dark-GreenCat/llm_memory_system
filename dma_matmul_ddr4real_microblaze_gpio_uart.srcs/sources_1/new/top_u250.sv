@@ -3,6 +3,9 @@
 module top_u250 (
     input SYSCLK0_300_N,
     input SYSCLK0_300_P,
+    
+    input USER_SI570_CLOCK_N,
+    input USER_SI570_CLOCK_P,
 
     input USB_UART_RX,
     output USB_UART_TX,
@@ -38,44 +41,44 @@ module top_u250 (
   wire [3:0] m_reg_src_addr;
 
   // Matrix Register File 0 signals
-  reg [3:0] matrix_regfile0_port_addr;
-  reg matrix_regfile0_port_en;
-  reg matrix_regfile0_port_rst;
-  reg [511:0] matrix_regfile0_port_we;
-  reg [4095:0] matrix_regfile0_port_din;
-  wire [4095:0] matrix_regfile0_port_dout;
+  logic [3:0] matrix_regfile0_port_addr;
+  logic matrix_regfile0_port_en;
+  logic matrix_regfile0_port_rst;
+  logic [511:0] matrix_regfile0_port_we;
+  logic [4095:0] matrix_regfile0_port_din;
+  logic [4095:0] matrix_regfile0_port_dout;
 
   // Matrix Register File 1 signals
-  reg [3:0] matrix_regfile1_port_addr;
-  reg matrix_regfile1_port_en;
-  reg matrix_regfile1_port_rst;
-  reg [511:0] matrix_regfile1_port_we;
-  reg [4095:0] matrix_regfile1_port_din;
-  wire [4095:0] matrix_regfile1_port_dout;
+  logic [3:0] matrix_regfile1_port_addr;
+  logic matrix_regfile1_port_en;
+  logic matrix_regfile1_port_rst;
+  logic [511:0] matrix_regfile1_port_we;
+  logic [4095:0] matrix_regfile1_port_din;
+  logic [4095:0] matrix_regfile1_port_dout;
 
   // Matrix Register File 2 signals
-  reg [3:0] matrix_regfile2_port_addr;
-  reg matrix_regfile2_port_en;
-  reg matrix_regfile2_port_rst;
-  reg [511:0] matrix_regfile2_port_we;
-  reg [4095:0] matrix_regfile2_port_din;
-  wire [4095:0] matrix_regfile2_port_dout;
+  logic [3:0] matrix_regfile2_port_addr;
+  logic matrix_regfile2_port_en;
+  logic matrix_regfile2_port_rst;
+  logic [511:0] matrix_regfile2_port_we;
+  logic [4095:0] matrix_regfile2_port_din;
+  logic [4095:0] matrix_regfile2_port_dout;
 
   // Matrix Register File 3 signals
-  reg [3:0] matrix_regfile3_port_addr;
-  reg matrix_regfile3_port_en;
-  reg matrix_regfile3_port_rst;
-  reg [511:0] matrix_regfile3_port_we;
-  reg [4095:0] matrix_regfile3_port_din;
-  wire [4095:0] matrix_regfile3_port_dout;
+  logic [3:0] matrix_regfile3_port_addr;
+  logic matrix_regfile3_port_en;
+  logic matrix_regfile3_port_rst;
+  logic [511:0] matrix_regfile3_port_we;
+  logic [4095:0] matrix_regfile3_port_din;
+  logic [4095:0] matrix_regfile3_port_dout;
 
   // Vector Register File signals
-  reg [3:0] vector_regfile_port_addr;
-  reg vector_regfile_port_en;
-  reg vector_regfile_port_rst;
-  reg [127:0] vector_regfile_port_we;
-  reg [1023:0] vector_regfile_port_din;
-  wire [1023:0] vector_regfile_port_dout;
+  logic [3:0] vector_regfile_port_addr;
+  logic vector_regfile_port_en;
+  logic vector_regfile_port_rst;
+  logic [127:0] vector_regfile_port_we;
+  logic [1023:0] vector_regfile_port_din;
+  logic [1023:0] vector_regfile_port_dout;
 
   /***********************************************/
   /******** END OF INTERFACE FOR MATMUL ********/
@@ -148,6 +151,8 @@ module top_u250 (
       .rs232_uart_rxd(USB_UART_RX),
       .rs232_uart_txd(USB_UART_TX),
       .ui_clk(clk),
+      .user_si570_clk_clk_n(USER_SI570_CLOCK_N),
+      .user_si570_clk_clk_p(USER_SI570_CLOCK_P),
       .vector_regfile_port_addr(vector_regfile_port_addr),
       .vector_regfile_port_clk(clk),
       .vector_regfile_port_din(vector_regfile_port_din),
@@ -167,39 +172,8 @@ module top_u250 (
     clk_count <= clk_count + 1;
     if (clk_count < 64'd10) begin
       rst_n <= 1'b0;  // Assert reset for the first 10 clock cycles
-      // Initialize BRAM signals during reset
-      matrix_regfile0_port_en <= 0;
-      matrix_regfile0_port_rst <= 1;
-      matrix_regfile0_port_we <= 0;
-      matrix_regfile0_port_addr <= 0;
-      matrix_regfile0_port_din <= 0;
-      matrix_regfile1_port_en <= 0;
-      matrix_regfile1_port_rst <= 1;
-      matrix_regfile1_port_we <= 0;
-      matrix_regfile1_port_addr <= 0;
-      matrix_regfile1_port_din <= 0;
-      matrix_regfile2_port_en <= 0;
-      matrix_regfile2_port_rst <= 1;
-      matrix_regfile2_port_we <= 0;
-      matrix_regfile2_port_addr <= 0;
-      matrix_regfile2_port_din <= 0;
-      matrix_regfile3_port_en <= 0;
-      matrix_regfile3_port_rst <= 1;
-      matrix_regfile3_port_we <= 0;
-      matrix_regfile3_port_addr <= 0;
-      matrix_regfile3_port_din <= 0;
-      vector_regfile_port_en <= 0;
-      vector_regfile_port_rst <= 1;
-      vector_regfile_port_we <= 0;
-      vector_regfile_port_addr <= 0;
-      vector_regfile_port_din <= 0;
     end else begin
       rst_n <= 1'b1;  // Release reset
-      matrix_regfile0_port_rst <= 0;
-      matrix_regfile1_port_rst <= 0;
-      matrix_regfile2_port_rst <= 0;
-      matrix_regfile3_port_rst <= 0;
-      vector_regfile_port_rst <= 0;
     end
 
     if (clk_count == 64'd100000000) begin

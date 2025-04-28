@@ -20,15 +20,28 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="32,118.334 ns"></ZoomStartTime>
-      <ZoomEndTime time="34,432.335 ns"></ZoomEndTime>
-      <Cursor1Time time="32,738.566 ns"></Cursor1Time>
+      <ZoomStartTime time="99,787 ps"></ZoomStartTime>
+      <ZoomEndTime time="100,200 ps"></ZoomEndTime>
+      <Cursor1Time time="100,007 ps"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="205"></NameColumnWidth>
-      <ValueColumnWidth column_width="190"></ValueColumnWidth>
+      <ValueColumnWidth column_width="182"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="15" />
+   <WVObjectSize size="13" />
+   <wvobject type="group" fp_name="group1175">
+      <obj_property name="label">Top Module</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/sim_tb_top/top/rst_n">
+         <obj_property name="ElementShortName">rst_n</obj_property>
+         <obj_property name="ObjectShortName">rst_n</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/sim_tb_top/top/clk">
+         <obj_property name="ElementShortName">clk</obj_property>
+         <obj_property name="ObjectShortName">clk</obj_property>
+      </wvobject>
+   </wvobject>
    <wvobject type="group" fp_name="group860">
       <obj_property name="label">DDR4 Clock</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -53,33 +66,26 @@
          <obj_property name="ElementShortName">c0_ddr4_ui_clk</obj_property>
          <obj_property name="ObjectShortName">c0_ddr4_ui_clk</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/memory_system_i/ddr4_0/addn_ui_clkout1">
-         <obj_property name="ElementShortName">addn_ui_clkout1</obj_property>
-         <obj_property name="ObjectShortName">addn_ui_clkout1</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/memory_system_i/ddr4_0/addn_ui_clkout2">
-         <obj_property name="ElementShortName">addn_ui_clkout2</obj_property>
-         <obj_property name="ObjectShortName">addn_ui_clkout2</obj_property>
-      </wvobject>
    </wvobject>
    <wvobject type="group" fp_name="group865">
       <obj_property name="label">Clock Wizard</obj_property>
       <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="logic" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/memory_system_i/clk_wiz/clk_in1_p">
+         <obj_property name="ElementShortName">clk_in1_p</obj_property>
+         <obj_property name="ObjectShortName">clk_in1_p</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/memory_system_i/clk_wiz/clk_in1_n">
+         <obj_property name="ElementShortName">clk_in1_n</obj_property>
+         <obj_property name="ObjectShortName">clk_in1_n</obj_property>
+      </wvobject>
       <wvobject type="logic" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/memory_system_i/clk_wiz/clk_out1">
          <obj_property name="ElementShortName">clk_out1</obj_property>
          <obj_property name="ObjectShortName">clk_out1</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/memory_system_i/clk_wiz/reset">
-         <obj_property name="ElementShortName">reset</obj_property>
-         <obj_property name="ObjectShortName">reset</obj_property>
-      </wvobject>
       <wvobject type="logic" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/memory_system_i/clk_wiz/locked">
          <obj_property name="ElementShortName">locked</obj_property>
          <obj_property name="ObjectShortName">locked</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/memory_system_i/clk_wiz/clk_in1">
-         <obj_property name="ElementShortName">clk_in1</obj_property>
-         <obj_property name="ObjectShortName">clk_in1</obj_property>
       </wvobject>
    </wvobject>
    <wvobject type="group" fp_name="group876">
@@ -199,9 +205,9 @@
       <obj_property name="ElementShortName">resetn</obj_property>
       <obj_property name="ObjectShortName">resetn</obj_property>
    </wvobject>
-   <wvobject type="array" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/start_matmul_request">
-      <obj_property name="ElementShortName">start_matmul_request[0:0]</obj_property>
-      <obj_property name="ObjectShortName">start_matmul_request[0:0]</obj_property>
+   <wvobject type="logic" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/start_matmul_request">
+      <obj_property name="ElementShortName">start_matmul_request</obj_property>
+      <obj_property name="ObjectShortName">start_matmul_request</obj_property>
    </wvobject>
    <wvobject type="logic" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/ui_clk">
       <obj_property name="ElementShortName">ui_clk</obj_property>
@@ -214,17 +220,5 @@
    <wvobject type="array" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/v_reg_src_addr">
       <obj_property name="ElementShortName">v_reg_src_addr[3:0]</obj_property>
       <obj_property name="ObjectShortName">v_reg_src_addr[3:0]</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/start_matmul_request_from_mem_system">
-      <obj_property name="ElementShortName">start_matmul_request_from_mem_system</obj_property>
-      <obj_property name="ObjectShortName">start_matmul_request_from_mem_system</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/start_matmul_request_from_mem_system_pre">
-      <obj_property name="ElementShortName">start_matmul_request_from_mem_system_pre</obj_property>
-      <obj_property name="ObjectShortName">start_matmul_request_from_mem_system_pre</obj_property>
-   </wvobject>
-   <wvobject type="logic" fp_name="/sim_tb_top/top/memory_system_wrapper_inst/start_matmul_request_real">
-      <obj_property name="ElementShortName">start_matmul_request_real</obj_property>
-      <obj_property name="ObjectShortName">start_matmul_request_real</obj_property>
    </wvobject>
 </wave_config>

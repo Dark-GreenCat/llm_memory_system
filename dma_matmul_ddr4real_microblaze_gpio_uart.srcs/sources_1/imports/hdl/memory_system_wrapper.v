@@ -2,7 +2,7 @@
 //Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
 //Tool Version: Vivado v.2024.1 (lin64) Build 5076996 Wed May 22 18:36:09 MDT 2024
-//Date        : Fri Apr 25 14:44:27 2025
+//Date        : Mon Apr 28 10:37:30 2025
 //Host        : edabk running 64-bit CentOS Linux release 7.9.2009 (Core)
 //Command     : generate_target memory_system_wrapper.bd
 //Design      : memory_system_wrapper
@@ -28,6 +28,7 @@ module memory_system_wrapper
     default_300mhz_clk0_clk_n,
     default_300mhz_clk0_clk_p,
     m_reg_src_addr,
+    matmul_idle,
     matrix_regfile0_port_addr,
     matrix_regfile0_port_clk,
     matrix_regfile0_port_din,
@@ -61,6 +62,8 @@ module memory_system_wrapper
     rs232_uart_txd,
     start_matmul_request,
     ui_clk,
+    user_si570_clk_clk_n,
+    user_si570_clk_clk_p,
     v_reg_dest_addr,
     v_reg_src_addr,
     vector_regfile_port_addr,
@@ -87,6 +90,7 @@ module memory_system_wrapper
   input default_300mhz_clk0_clk_n;
   input default_300mhz_clk0_clk_p;
   output [3:0]m_reg_src_addr;
+  input [0:0]matmul_idle;
   input [3:0]matrix_regfile0_port_addr;
   input matrix_regfile0_port_clk;
   input [4095:0]matrix_regfile0_port_din;
@@ -118,8 +122,10 @@ module memory_system_wrapper
   input resetn;
   input rs232_uart_rxd;
   output rs232_uart_txd;
-  output [0:0]start_matmul_request;
+  output start_matmul_request;
   output ui_clk;
+  input user_si570_clk_clk_n;
+  input user_si570_clk_clk_p;
   output [3:0]v_reg_dest_addr;
   output [3:0]v_reg_src_addr;
   input [3:0]vector_regfile_port_addr;
@@ -147,6 +153,7 @@ module memory_system_wrapper
   wire default_300mhz_clk0_clk_n;
   wire default_300mhz_clk0_clk_p;
   wire [3:0]m_reg_src_addr;
+  wire [0:0]matmul_idle;
   wire [3:0]matrix_regfile0_port_addr;
   wire matrix_regfile0_port_clk;
   wire [4095:0]matrix_regfile0_port_din;
@@ -178,8 +185,10 @@ module memory_system_wrapper
   wire resetn;
   wire rs232_uart_rxd;
   wire rs232_uart_txd;
-  wire [0:0]start_matmul_request;
+  wire start_matmul_request;
   wire ui_clk;
+  wire user_si570_clk_clk_n;
+  wire user_si570_clk_clk_p;
   wire [3:0]v_reg_dest_addr;
   wire [3:0]v_reg_src_addr;
   wire [3:0]vector_regfile_port_addr;
@@ -190,9 +199,6 @@ module memory_system_wrapper
   wire vector_regfile_port_rst;
   wire [127:0]vector_regfile_port_we;
 
-
-
-  wire start_matmul_request_from_mem_system;
   memory_system memory_system_i
        (.ddr4_sdram_c0_act_n(ddr4_sdram_c0_act_n),
         .ddr4_sdram_c0_adr(ddr4_sdram_c0_adr),
@@ -211,6 +217,7 @@ module memory_system_wrapper
         .default_300mhz_clk0_clk_n(default_300mhz_clk0_clk_n),
         .default_300mhz_clk0_clk_p(default_300mhz_clk0_clk_p),
         .m_reg_src_addr(m_reg_src_addr),
+        .matmul_idle(matmul_idle),
         .matrix_regfile0_port_addr(matrix_regfile0_port_addr),
         .matrix_regfile0_port_clk(matrix_regfile0_port_clk),
         .matrix_regfile0_port_din(matrix_regfile0_port_din),
@@ -242,8 +249,10 @@ module memory_system_wrapper
         .resetn(resetn),
         .rs232_uart_rxd(rs232_uart_rxd),
         .rs232_uart_txd(rs232_uart_txd),
-        .start_matmul_request(start_matmul_request_from_mem_system),
+        .start_matmul_request(start_matmul_request),
         .ui_clk(ui_clk),
+        .user_si570_clk_clk_n(user_si570_clk_clk_n),
+        .user_si570_clk_clk_p(user_si570_clk_clk_p),
         .v_reg_dest_addr(v_reg_dest_addr),
         .v_reg_src_addr(v_reg_src_addr),
         .vector_regfile_port_addr(vector_regfile_port_addr),
@@ -253,22 +262,4 @@ module memory_system_wrapper
         .vector_regfile_port_en(vector_regfile_port_en),
         .vector_regfile_port_rst(vector_regfile_port_rst),
         .vector_regfile_port_we(vector_regfile_port_we));
-
-    reg start_matmul_request_from_mem_system_pre = 0;
-    reg start_matmul_request_real = 0;
-
-    always @ (posedge ui_clk) begin
-        start_matmul_request_from_mem_system_pre <= start_matmul_request_from_mem_system;
-    end
-
-    always @ (posedge ui_clk) begin
-        if (start_matmul_request_from_mem_system_pre == 0 && start_matmul_request_from_mem_system == 1) begin
-            start_matmul_request_real <= 1;
-        end
-        else begin
-            start_matmul_request_real <= 0;
-        end
-    end
-
-    assign start_matmul_request = start_matmul_request_real;
 endmodule

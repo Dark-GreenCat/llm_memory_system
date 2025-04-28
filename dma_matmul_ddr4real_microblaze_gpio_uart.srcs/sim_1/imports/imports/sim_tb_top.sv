@@ -1,76 +1,4 @@
-
-
-/******************************************************************************
-# (c) Copyright 2023 Advanced Micro Devices, Inc. All rights reserved.
-#
-# This file contains confidential and proprietary information
-# of AMD and is protected under U.S. and international copyright
-# and other intellectual property laws.
-#
-# DISCLAIMER
-# This disclaimer is not a license and does not grant any
-# rights to the materials distributed herewith. Except as
-# otherwise provided in a valid license issued to you by
-# AMD, and to the maximum extent permitted by applicable
-# law: (1) THESE MATERIALS ARE MADE AVAILABLE "AS IS" AND
-# WITH ALL FAULTS, AND AMD HEREBY DISCLAIMS ALL WARRANTIES
-# AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY, INCLUDING
-# BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-
-# INFRINGEMENT, OR FITNESS FOR ANY PARTICULAR PURPOSE; and
-# (2) AMD shall not be liable (whether in contract or tort,
-# including negligence, or under any other theory of
-# liability) for any loss or damage of any kind or nature
-# related to, arising under or in connection with these
-# materials, including for any direct, or any indirect,
-# special, incidental, or consequential loss or damage
-# (including loss of data, profits, goodwill, or any type of
-# loss or damage suffered as a result of any action brought
-# by a third party) even if such damage or loss was
-# reasonably foreseeable or AMD had been advised of the
-# possibility of the same.
-#
-# CRITICAL APPLICATIONS
-# AMD products are not designed or intended to be fail-
-# safe, or for use in any application requiring fail-safe
-# performance, such as life-support or safety devices or
-# systems, Class III medical devices, nuclear facilities,
-# applications related to the deployment of airbags, or any
-# other applications that could lead to death, personal
-# injury, or severe property or environmental damage
-# (individually and collectively, "Critical
-# Applications"). Customer assumes the sole risk and
-# liability of any use of AMD products in Critical
-# Applications, subject only to applicable laws and
-# regulations governing limitations on product liability.
-#
-# THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
-# PART OF THIS FILE AT ALL TIMES.
-******************************************************************************/
-//   ____  ____
-//  /   /\/   /
-// /___/  \  /    Vendor             : AMD
-// \   \   \/     Version            : 1.0
-//  \   \         Application        : MIG
-//  /   /         Filename           : sim_tb_top.sv
-// /___/   /\     Date Last Modified : $Date: 2014/09/03 $
-// \   \  /  \    Date Created       : Thu Apr 18 2013
-//  \___\/\___\
-//
-// Device           : UltraScale
-// Design Name      : DDR4_SDRAM
-// Purpose          :
-//                   Top-level testbench for testing Memory interface.
-//                   Instantiates:
-//                     1. IP_TOP (top-level representing FPGA, contains core,
-//                        clocking, built-in testbench/memory checker and other
-//                        support structures)
-//                     2. Memory Model
-//                     3. Miscellaneous clock generation and reset logic
-// Reference        :
-// Revision History :
-//*****************************************************************************
-
-`timescale 1ps/1ps
+`timescale 1ps / 1ps
 
 `ifdef XILINX_SIMULATOR
 module short (
@@ -141,6 +69,11 @@ module sim_tb_top;
   wire        c0_sys_clk_p;
   wire        c0_sys_clk_n;
 
+  reg         user_clk_i;
+
+  wire        user_clk_p;
+  wire        user_clk_n;
+
   reg  [16:0] c0_ddr4_adr_sdram       [1:0];
   reg  [ 1:0] c0_ddr4_ba_sdram        [1:0];
   reg  [ 1:0] c0_ddr4_bg_sdram        [1:0];
@@ -199,6 +132,12 @@ module sim_tb_top;
   assign c0_sys_clk_p = sys_clk_i;
   assign c0_sys_clk_n = ~sys_clk_i;
 
+  initial user_clk_i = 1'b0;
+  always user_clk_i = #(6400 / 2.0) ~user_clk_i;
+
+  assign user_clk_p = user_clk_i;
+  assign user_clk_n = ~user_clk_i;
+
   assign c0_ddr4_ck_t = c0_ddr4_ck_t_int[0];
   assign c0_ddr4_ck_c = c0_ddr4_ck_c_int[0];
 
@@ -227,276 +166,12 @@ module sim_tb_top;
   //                         FPGA Memory Controller instantiation
   //===========================================================================
 
-  // example_top 
-  //   u_example_top
-  //   (
-  //    .sys_rst           (sys_rst),
-
-  //    .c0_data_compare_error  (c0_data_compare_error),
-  //    .c0_init_calib_complete (c0_init_calib_complete),
-  //    .c0_sys_clk_p           (c0_sys_clk_p),
-  //    .c0_sys_clk_n           (c0_sys_clk_n),
-
-  //    .c0_ddr4_act_n          (c0_ddr4_act_n),
-  //    .c0_ddr4_adr            (c0_ddr4_adr),
-  //    .c0_ddr4_ba             (c0_ddr4_ba),
-  //    .c0_ddr4_bg             (c0_ddr4_bg),
-  //    .c0_ddr4_cke            (c0_ddr4_cke),
-  //    .c0_ddr4_odt            (c0_ddr4_odt),
-  //    .c0_ddr4_cs_n           (c0_ddr4_cs_n),
-  //    .c0_ddr4_ck_t           (c0_ddr4_ck_t_int),
-  //    .c0_ddr4_ck_c           (c0_ddr4_ck_c_int),
-  //    .c0_ddr4_reset_n        (c0_ddr4_reset_n),
-  //    .c0_ddr4_parity            (c0_ddr4_parity),
-  //    .c0_ddr4_dq             (c0_ddr4_dq),
-  //    .c0_ddr4_dqs_c          (c0_ddr4_dqs_c),
-  //    .c0_ddr4_dqs_t          (c0_ddr4_dqs_t)
-  //    );
-
-  integer log_file;  // File handle for logging
-  integer dump_file;  // File handle for BRAM dump
-
-
-  initial begin
-    $dumpfile("sim_tb_top.vcd");
-    $dumpvars(0, sim_tb_top);
-  end
-
-   initial begin
-     // Open log file
-     log_file = $fopen("sim_top_u250.log", "w");
-     $fdisplay(log_file, "Simulation started");
-
-     #500;
-
-     @(posedge top.start_matmul_request);
-     $display("Start request: %d", top.start_matmul_request);
-
-     while (top.start_matmul_request == 0) begin
-       @(posedge top.clk);
-     end
-
-     // Call task to dump vector_regfile
-//     dump_vector_regfile;
-//     dump_matrix_regfile0;
-//     dump_matrix_regfile1;
-//     dump_matrix_regfile2;
-//     dump_matrix_regfile3;
-
-     $fclose(log_file);  // Close the log file before finishing
-     
-   end
-   initial begin
-        repeat (10000) @(posedge sys_clk_i);
-        $finish;
-   end
-
-
-   // Task to dump vector_regfile contents to bram_dump.txt
-//   task dump_vector_regfile;
-//     integer addr;
-//     integer dump_file;
-//     begin
-//       // Open dump file
-//       dump_file = $fopen("vector_dump.txt", "w");
-//       if (dump_file == 0) begin
-//         $display("Error: Could not open vector_dump.txt for writing");
-//         $finish;
-//       end
-//       $fdisplay(dump_file, "Vector Register File Dump");
-//       $fdisplay(dump_file, "------------------------");
-
-//       // Wait for reset to be released (clk_count >= 10 in top_u250)
-//       @(posedge top.clk);
-//       while (top.rst_n == 0) @(posedge top.clk);
-
-//       // Enable vector_regfile for reading
-//       top.vector_regfile_port_en  = 1;
-//       top.vector_regfile_port_rst = 0;
-//       top.vector_regfile_port_we  = 0;
-
-//       // Loop through all addresses (0 to 15)
-//       for (addr = 0; addr < 16; addr = addr + 1) begin
-//         top.vector_regfile_port_addr = addr;
-//         @(posedge top.clk);  // Wait for address to be set
-//         @(posedge top.clk);  // Wait for 2-cycle latency
-//         @(posedge top.clk);
-//         $fdisplay(dump_file, "ADDR: %0d DATA: %h", addr, top.vector_regfile_port_dout);
-//       end
-
-//       // Disable vector_regfile
-//       top.vector_regfile_port_en = 0;
-
-//       // Close dump file
-//       $fclose(dump_file);
-//     end
-//   endtask
-
-//   // Task to dump vector_regfile contents to matrix_dump.txt
-//   task dump_matrix_regfile0;
-//     integer addr;
-//     integer dump_file;
-//     begin
-//       // Open dump file
-//       dump_file = $fopen("matrix0_dump.txt", "w");
-//       if (dump_file == 0) begin
-//         $display("Error: Could not open matrix0_dump.txt for writing");
-//         $finish;
-//       end
-//       $fdisplay(dump_file, "Matrix Register File 0 Dump");
-//       $fdisplay(dump_file, "------------------------");
-
-//       // Wait for reset to be released (clk_count >= 10 in top_u250)
-//       @(posedge top.clk);
-//       while (top.rst_n == 0) @(posedge top.clk);
-
-//       // Enable vector_regfile for reading
-//       top.matrix_regfile0_port_en  = 1;
-//       top.matrix_regfile0_port_rst = 0;
-//       top.matrix_regfile0_port_we  = 0;
-
-//       // Loop through all addresses (0 to 15)
-//       for (addr = 0; addr < 16; addr = addr + 1) begin
-//         top.matrix_regfile0_port_addr = addr;
-//         @(posedge top.clk);  // Wait for address to be set
-//         @(posedge top.clk);  // Wait for 2-cycle latency
-//         @(posedge top.clk);
-//         $fdisplay(dump_file, "ADDR: %0d DATA: %h", addr, top.matrix_regfile0_port_dout);
-//       end
-
-//       // Disable vector_regfile
-//       top.matrix_regfile0_port_en = 0;
-
-//       // Close dump file
-//       $fclose(dump_file);
-//     end
-//   endtask
-
-//   // Task to dump vector_regfile contents to matrix_dump.txt
-//   task dump_matrix_regfile1;
-//     integer addr;
-//     integer dump_file;
-//     begin
-//       // Open dump file
-//       dump_file = $fopen("matrix1_dump.txt", "w");
-//       if (dump_file == 0) begin
-//         $display("Error: Could not open matrix1_dump.txt for writing");
-//         $finish;
-//       end
-//       $fdisplay(dump_file, "Matrix Register File 1 Dump");
-//       $fdisplay(dump_file, "------------------------");
-
-//       // Wait for reset to be released (clk_count >= 10 in top_u250)
-//       @(posedge top.clk);
-//       while (top.rst_n == 0) @(posedge top.clk);
-
-//       // Enable vector_regfile for reading
-//       top.matrix_regfile1_port_en  = 1;
-//       top.matrix_regfile1_port_rst = 0;
-//       top.matrix_regfile1_port_we  = 0;
-
-//       // Loop through all addresses (0 to 15)
-//       for (addr = 0; addr < 16; addr = addr + 1) begin
-//         top.matrix_regfile1_port_addr = addr;
-//         @(posedge top.clk);  // Wait for address to be set
-//         @(posedge top.clk);  // Wait for 2-cycle latency
-//         @(posedge top.clk);
-//         $fdisplay(dump_file, "ADDR: %0d DATA: %h", addr, top.matrix_regfile1_port_dout);
-//       end
-
-//       // Disable vector_regfile
-//       top.matrix_regfile1_port_en = 0;
-
-//       // Close dump file
-//       $fclose(dump_file);
-//     end
-//   endtask
-
-//   // Task to dump vector_regfile contents to matrix_dump.txt
-//   task dump_matrix_regfile2;
-//     integer addr;
-//     integer dump_file;
-//     begin
-//       // Open dump file
-//       dump_file = $fopen("matrix2_dump.txt", "w");
-//       if (dump_file == 0) begin
-//         $display("Error: Could not open matrix_dump.txt for writing");
-//         $finish;
-//       end
-//       $fdisplay(dump_file, "Matrix Register File 2 Dump");
-//       $fdisplay(dump_file, "------------------------");
-
-//       // Wait for reset to be released (clk_count >= 10 in top_u250)
-//       @(posedge top.clk);
-//       while (top.rst_n == 0) @(posedge top.clk);
-
-//       // Enable vector_regfile for reading
-//       top.matrix_regfile2_port_en  = 1;
-//       top.matrix_regfile2_port_rst = 0;
-//       top.matrix_regfile2_port_we  = 0;
-
-//       // Loop through all addresses (0 to 15)
-//       for (addr = 0; addr < 16; addr = addr + 1) begin
-//         top.matrix_regfile2_port_addr = addr;
-//         @(posedge top.clk);  // Wait for address to be set
-//         @(posedge top.clk);  // Wait for 2-cycle latency
-//         @(posedge top.clk);
-//         $fdisplay(dump_file, "ADDR: %0d DATA: %h", addr, top.matrix_regfile2_port_dout);
-//       end
-
-//       // Disable vector_regfile
-//       top.matrix_regfile2_port_en = 0;
-
-//       // Close dump file
-//       $fclose(dump_file);
-//     end
-//   endtask
-
-//   // Task to dump vector_regfile contents to matrix_dump.txt
-//   task dump_matrix_regfile3;
-//     integer addr;
-//     integer dump_file;
-//     begin
-//       // Open dump file
-//       dump_file = $fopen("matrix3_dump.txt", "w");
-//       if (dump_file == 0) begin
-//         $display("Error: Could not open matrix_dump.txt for writing");
-//         $finish;
-//       end
-//       $fdisplay(dump_file, "Matrix Register File 3 Dump");
-//       $fdisplay(dump_file, "------------------------");
-
-//       // Wait for reset to be released (clk_count >= 10 in top_u250)
-//       @(posedge top.clk);
-//       while (top.rst_n == 0) @(posedge top.clk);
-
-//       // Enable vector_regfile for reading
-//       top.matrix_regfile3_port_en  = 1;
-//       top.matrix_regfile3_port_rst = 0;
-//       top.matrix_regfile3_port_we  = 0;
-
-//       // Loop through all addresses (0 to 15)
-//       for (addr = 0; addr < 16; addr = addr + 1) begin
-//         top.matrix_regfile3_port_addr = addr;
-//         @(posedge top.clk);  // Wait for address to be set
-//         @(posedge top.clk);  // Wait for 2-cycle latency
-//         @(posedge top.clk);
-//         $fdisplay(dump_file, "ADDR: %0d DATA: %h", addr, top.matrix_regfile3_port_dout);
-//       end
-
-//       // Disable vector_regfile
-//       top.matrix_regfile3_port_en = 0;
-
-//       // Close dump file
-//       $fclose(dump_file);
-//     end
-//   endtask
-
-
-
   top_u250 top (
       .SYSCLK0_300_N(c0_sys_clk_n),
       .SYSCLK0_300_P(c0_sys_clk_p),
+
+      .USER_SI570_CLOCK_N(user_clk_n),
+      .USER_SI570_CLOCK_P(user_clk_p),
 
       .c0_ddr4_act_n  (c0_ddr4_act_n),
       .c0_ddr4_adr    (c0_ddr4_adr),
@@ -632,5 +307,239 @@ module sim_tb_top;
       );
     end
   endgenerate
+
+  //===========================================================================
+  //                         Testbench
+  //===========================================================================
+
+  integer log_file;  // File handle for logging
+  integer dump_file;  // File handle for BRAM dump
+
+  initial begin
+    $dumpfile("sim_tb_top.vcd");
+    $dumpvars(0, sim_tb_top);
+  end
+
+   initial begin
+     // Open log file
+     log_file = $fopen("sim_top_u250.log", "w");
+     $fdisplay(log_file, "Simulation started");
+
+     #500;
+
+     @(posedge top.start_matmul_request);
+     $display("Start request: %d", top.start_matmul_request);
+
+    // Call task to dump vector_regfile
+    dump_vector_regfile;
+    dump_matrix_regfile0;
+    dump_matrix_regfile1;
+    dump_matrix_regfile2;
+    dump_matrix_regfile3;
+
+    $fclose(log_file);  // Close the log file before finishing
+    $finish;
+   end
+
+
+   // Task to dump vector_regfile contents to bram_dump.txt
+  task dump_vector_regfile;
+    integer addr;
+    integer dump_file;
+    begin
+      // Open dump file
+      dump_file = $fopen("vector_dump.txt", "w");
+      if (dump_file == 0) begin
+        $display("Error: Could not open vector_dump.txt for writing");
+        $finish;
+      end
+      $fdisplay(dump_file, "Vector Register File Dump");
+      $fdisplay(dump_file, "------------------------");
+
+      // Wait for reset to be released (clk_count >= 10 in top_u250)
+      @(posedge top.clk);
+      while (top.rst_n == 0) @(posedge top.clk);
+
+      // Enable vector_regfile for reading
+      top.vector_regfile_port_en  = 1;
+      top.vector_regfile_port_rst = 0;
+      top.vector_regfile_port_we  = 0;
+
+      // Loop through all addresses (0 to 15)
+      for (addr = 0; addr < 16; addr = addr + 1) begin
+        top.vector_regfile_port_addr = addr;
+        @(posedge top.clk);  // Wait for address to be set
+        @(posedge top.clk);  // Wait for 2-cycle latency
+        @(posedge top.clk);
+        $fdisplay(dump_file, "ADDR: %0d DATA: %h", addr, top.vector_regfile_port_dout);
+      end
+
+      // Disable vector_regfile
+      top.vector_regfile_port_en = 0;
+
+      // Close dump file
+      $fclose(dump_file);
+    end
+  endtask
+
+  // Task to dump vector_regfile contents to matrix_dump.txt
+  task dump_matrix_regfile0;
+    integer addr;
+    integer dump_file;
+    begin
+      // Open dump file
+      dump_file = $fopen("matrix0_dump.txt", "w");
+      if (dump_file == 0) begin
+        $display("Error: Could not open matrix0_dump.txt for writing");
+        $finish;
+      end
+      $fdisplay(dump_file, "Matrix Register File 0 Dump");
+      $fdisplay(dump_file, "------------------------");
+
+      // Wait for reset to be released (clk_count >= 10 in top_u250)
+      @(posedge top.clk);
+      while (top.rst_n == 0) @(posedge top.clk);
+
+      // Enable vector_regfile for reading
+      top.matrix_regfile0_port_en  = 1;
+      top.matrix_regfile0_port_rst = 0;
+      top.matrix_regfile0_port_we  = 0;
+
+      // Loop through all addresses (0 to 15)
+      for (addr = 0; addr < 16; addr = addr + 1) begin
+        top.matrix_regfile0_port_addr = addr;
+        @(posedge top.clk);  // Wait for address to be set
+        @(posedge top.clk);  // Wait for 2-cycle latency
+        @(posedge top.clk);
+        $fdisplay(dump_file, "ADDR: %0d DATA: %h", addr, top.matrix_regfile0_port_dout);
+      end
+
+      // Disable vector_regfile
+      top.matrix_regfile0_port_en = 0;
+
+      // Close dump file
+      $fclose(dump_file);
+    end
+  endtask
+
+  // Task to dump vector_regfile contents to matrix_dump.txt
+  task dump_matrix_regfile1;
+    integer addr;
+    integer dump_file;
+    begin
+      // Open dump file
+      dump_file = $fopen("matrix1_dump.txt", "w");
+      if (dump_file == 0) begin
+        $display("Error: Could not open matrix1_dump.txt for writing");
+        $finish;
+      end
+      $fdisplay(dump_file, "Matrix Register File 1 Dump");
+      $fdisplay(dump_file, "------------------------");
+
+      // Wait for reset to be released (clk_count >= 10 in top_u250)
+      @(posedge top.clk);
+      while (top.rst_n == 0) @(posedge top.clk);
+
+      // Enable vector_regfile for reading
+      top.matrix_regfile1_port_en  = 1;
+      top.matrix_regfile1_port_rst = 0;
+      top.matrix_regfile1_port_we  = 0;
+
+      // Loop through all addresses (0 to 15)
+      for (addr = 0; addr < 16; addr = addr + 1) begin
+        top.matrix_regfile1_port_addr = addr;
+        @(posedge top.clk);  // Wait for address to be set
+        @(posedge top.clk);  // Wait for 2-cycle latency
+        @(posedge top.clk);
+        $fdisplay(dump_file, "ADDR: %0d DATA: %h", addr, top.matrix_regfile1_port_dout);
+      end
+
+      // Disable vector_regfile
+      top.matrix_regfile1_port_en = 0;
+
+      // Close dump file
+      $fclose(dump_file);
+    end
+  endtask
+
+  // Task to dump vector_regfile contents to matrix_dump.txt
+  task dump_matrix_regfile2;
+    integer addr;
+    integer dump_file;
+    begin
+      // Open dump file
+      dump_file = $fopen("matrix2_dump.txt", "w");
+      if (dump_file == 0) begin
+        $display("Error: Could not open matrix_dump.txt for writing");
+        $finish;
+      end
+      $fdisplay(dump_file, "Matrix Register File 2 Dump");
+      $fdisplay(dump_file, "------------------------");
+
+      // Wait for reset to be released (clk_count >= 10 in top_u250)
+      @(posedge top.clk);
+      while (top.rst_n == 0) @(posedge top.clk);
+
+      // Enable vector_regfile for reading
+      top.matrix_regfile2_port_en  = 1;
+      top.matrix_regfile2_port_rst = 0;
+      top.matrix_regfile2_port_we  = 0;
+
+      // Loop through all addresses (0 to 15)
+      for (addr = 0; addr < 16; addr = addr + 1) begin
+        top.matrix_regfile2_port_addr = addr;
+        @(posedge top.clk);  // Wait for address to be set
+        @(posedge top.clk);  // Wait for 2-cycle latency
+        @(posedge top.clk);
+        $fdisplay(dump_file, "ADDR: %0d DATA: %h", addr, top.matrix_regfile2_port_dout);
+      end
+
+      // Disable vector_regfile
+      top.matrix_regfile2_port_en = 0;
+
+      // Close dump file
+      $fclose(dump_file);
+    end
+  endtask
+
+  // Task to dump vector_regfile contents to matrix_dump.txt
+  task dump_matrix_regfile3;
+    integer addr;
+    integer dump_file;
+    begin
+      // Open dump file
+      dump_file = $fopen("matrix3_dump.txt", "w");
+      if (dump_file == 0) begin
+        $display("Error: Could not open matrix_dump.txt for writing");
+        $finish;
+      end
+      $fdisplay(dump_file, "Matrix Register File 3 Dump");
+      $fdisplay(dump_file, "------------------------");
+
+      // Wait for reset to be released (clk_count >= 10 in top_u250)
+      @(posedge top.clk);
+      while (top.rst_n == 0) @(posedge top.clk);
+
+      // Enable vector_regfile for reading
+      top.matrix_regfile3_port_en  = 1;
+      top.matrix_regfile3_port_rst = 0;
+      top.matrix_regfile3_port_we  = 0;
+
+      // Loop through all addresses (0 to 15)
+      for (addr = 0; addr < 16; addr = addr + 1) begin
+        top.matrix_regfile3_port_addr = addr;
+        @(posedge top.clk);  // Wait for address to be set
+        @(posedge top.clk);  // Wait for 2-cycle latency
+        @(posedge top.clk);
+        $fdisplay(dump_file, "ADDR: %0d DATA: %h", addr, top.matrix_regfile3_port_dout);
+      end
+
+      // Disable vector_regfile
+      top.matrix_regfile3_port_en = 0;
+
+      // Close dump file
+      $fclose(dump_file);
+    end
+  endtask
 
 endmodule
